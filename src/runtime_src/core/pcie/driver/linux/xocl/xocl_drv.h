@@ -82,10 +82,11 @@
 	#define XOCL_USEC tv_usec
 #endif
 
-/* drm_gem_object_put_unlocked and drm_gem_object_get were introduced with Linux
- * 4.12 and backported to Red Hat 7.5.
+/*
+ * drm_gem_object_put_unlocked and drm_gem_object_get were introduced with Linux
+ * 4.12 and backported to Red Hat 7.5. drm_gem_object_put_unlocked is gone since 5.9.
  */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,7,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5,9,0)
 	#define XOCL_DRM_GEM_OBJECT_PUT_UNLOCKED drm_gem_object_put
 	#define XOCL_DRM_GEM_OBJECT_GET drm_gem_object_get
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
