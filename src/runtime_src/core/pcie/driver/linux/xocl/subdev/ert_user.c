@@ -242,8 +242,7 @@ ert_release_slot(struct xocl_ert_user *ert_user, struct ert_user_command *ecmd)
 	ecmd->slot_idx = no_index;
 }
 
-/**
- * process_ert_cq() - Process completed queue
+/* process_ert_cq() - Process completed queue
  * @ert_user: Target XRT CU
  */
 static inline void process_ert_cq(struct xocl_ert_user *ert_user)
