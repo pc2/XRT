@@ -901,7 +901,7 @@ static void queue_req_release_resource(struct qdma_stream_queue *queue,
 	if (reqcb->is_unmgd) {
 		xdev_handle_t xdev = xocl_get_xdev(queue->qdma->pdev);
 
-		pci_unmap_sg(XDEV(xdev)->pdev, reqcb->unmgd.sgt->sgl,
+		dma_unmap_sg(&XDEV(xdev)->pdev->dev, reqcb->unmgd.sgt->sgl,
 			     reqcb->nsg, queue->qconf.c2h ?  DMA_FROM_DEVICE :
 			    				     DMA_TO_DEVICE);
 		xocl_finish_unmgd(&reqcb->unmgd);
@@ -1094,7 +1094,7 @@ static ssize_t queue_rw(struct xocl_qdma *qdma, struct qdma_stream_queue *queue,
 			goto error_out;
 		}
 
-		nents = pci_map_sg(XDEV(xdev)->pdev, unmgd.sgt->sgl,
+		nents = dma_map_sg(&XDEV(xdev)->pdev->dev, unmgd.sgt->sgl,
 			unmgd.sgt->orig_nents, dir);
 		if (!nents) {
 			xocl_err(&qdma->pdev->dev, "map sgl failed");
@@ -1616,8 +1616,8 @@ static long qdma_stream_ioctl_alloc_buffer(struct xocl_qdma *qdma,
 		goto failed;
 	}
 
-	xobj->dma_nsg = pci_map_sg(XDEV(xdev)->pdev, xobj->sgt->sgl,
-	xobj->sgt->orig_nents, PCI_DMA_BIDIRECTIONAL);
+	xobj->dma_nsg = dma_map_sg(&XDEV(xdev)->pdev->dev, xobj->sgt->sgl,
+	xobj->sgt->orig_nents, DMA_BIDIRECTIONAL);
 	if (!xobj->dma_nsg) {
 		xocl_err(&qdma->pdev->dev, "map sgl failed, sgt");
 		ret = -EIO;
