@@ -240,7 +240,7 @@ void qdma_request_unmap(struct pci_dev *pdev, struct qdma_request *req)
 						DMA_FROM_DEVICE;
 
 	if (req->use_sgt) {
-		pci_unmap_sg(pdev, req->sgt->sgl, req->sgt->orig_nents, dir);
+		dma_unmap_sg(&pdev->dev, req->sgt->sgl, req->sgt->orig_nents, dir);
 	} else {
 		struct qdma_sw_sg *sg = req->sgl;
 		unsigned int sgcnt = req->sgcnt;
@@ -274,7 +274,7 @@ int qdma_request_map(struct pci_dev *pdev, struct qdma_request *req)
 						DMA_FROM_DEVICE;
 
 	if (req->use_sgt) {
-		int nents = pci_map_sg(pdev, req->sgt->sgl,
+		int nents = dma_map_sg(&pdev->dev, req->sgt->sgl,
 					req->sgt->orig_nents, dir);
 
 		if (!nents) {
