@@ -84,7 +84,7 @@ static int xocl_bo_mmap(struct file *filp, struct vm_area_struct *vma)
 		return -EINVAL;
 	}
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)  && !defined(RHEL_9_5_GE)
 	/* Clear VM_PFNMAP flag set by drm_gem_mmap()
 	 * we have "struct page" for all backing pages for bo
 	 */
@@ -157,7 +157,7 @@ static int xocl_native_mmap(struct file *filp, struct vm_area_struct *vma)
 
 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)  && !defined(RHEL_9_5_GE)
 	vma->vm_flags |= VM_IO;
 	vma->vm_flags |= VM_RESERVED;
 #else
@@ -407,6 +407,11 @@ static uint xocl_poll(struct file *filp, poll_table *wait)
 	return xocl_poll_client(filp, wait, priv->driver_priv);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0) || defined(RHEL_9_5_GE)
+	/* This was removed in 6.8 */
+	#define DRM_UNLOCKED 0
+#endif
+
 static const struct drm_ioctl_desc xocl_ioctls[] = {
 	DRM_IOCTL_DEF_DRV(XOCL_CREATE_BO, xocl_create_bo_ioctl,
 			  DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
@@ -502,17 +507,17 @@ static const struct vm_operations_struct xocl_vm_ops = {
 
 static struct drm_driver mm_drm_driver = {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 4, 0)
-#if defined(RHEL_RELEASE_CODE)
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
-        .driver_features                = DRIVER_GEM | DRIVER_RENDER,
-#else
-	.driver_features		= DRIVER_GEM | DRIVER_PRIME |
-						DRIVER_RENDER,
-#endif
-#else
-        .driver_features                = DRIVER_GEM | DRIVER_PRIME |
-                                                DRIVER_RENDER,
-#endif
+	#if defined(RHEL_RELEASE_CODE)
+		#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
+			.driver_features   = DRIVER_GEM | DRIVER_RENDER,
+		#else
+			.driver_features	= DRIVER_GEM | DRIVER_PRIME | DRIVER_RENDER,
+
+		#endif
+	#else
+			.driver_features    = DRIVER_GEM | DRIVER_PRIME | DRIVER_RENDER,
+			
+	#endif
 #else
 	.driver_features		= DRIVER_GEM | DRIVER_RENDER,
 #endif
@@ -541,7 +546,9 @@ static struct drm_driver mm_drm_driver = {
 	.fops				= &xocl_driver_fops,
 
 	.gem_prime_import_sg_table	= xocl_gem_prime_import_sg_table,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0) && !defined(RHEL_9_4_GE)
 	.gem_prime_mmap			= xocl_gem_prime_mmap,
+#endif
 
 	.prime_handle_to_fd		= drm_gem_prime_handle_to_fd,
 	.prime_fd_to_handle		= drm_gem_prime_fd_to_handle,

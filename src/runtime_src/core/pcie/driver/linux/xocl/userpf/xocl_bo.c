@@ -1322,33 +1322,33 @@ out_free:
 }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 11, 0) && !defined(RHEL_8_5_GE)
-void *xocl_gem_prime_vmap(struct drm_gem_object *obj)
-{
-	struct drm_xocl_bo *xobj = to_xocl_bo(obj);
+	void *xocl_gem_prime_vmap(struct drm_gem_object *obj)
+	{
+		struct drm_xocl_bo *xobj = to_xocl_bo(obj);
 
-	BO_ENTER("xobj %p", xobj);
-	return xobj->vmapping;
-}
+		BO_ENTER("xobj %p", xobj);
+		return xobj->vmapping;
+	}
 
-void xocl_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr)
-{
+	void xocl_gem_prime_vunmap(struct drm_gem_object *obj, void *vaddr)
+	{
 
-}
+	}
 #else
-int xocl_gem_prime_vmap(struct drm_gem_object *obj, struct XOCL_MAP_TYPE *map)
-{
-        struct drm_xocl_bo *xobj = to_xocl_bo(obj);
+	int xocl_gem_prime_vmap(struct drm_gem_object *obj, struct XOCL_MAP_TYPE *map)
+	{
+			struct drm_xocl_bo *xobj = to_xocl_bo(obj);
 
-        BO_ENTER("xobj %p", xobj);
-        XOCL_MAP_SET_VADDR(map, xobj->vmapping);
+			BO_ENTER("xobj %p", xobj);
+			XOCL_MAP_SET_VADDR(map, xobj->vmapping);
 
-        return 0;
-}
+			return 0;
+	}
 
-void xocl_gem_prime_vunmap(struct drm_gem_object *obj, struct XOCL_MAP_TYPE *map)
-{
+	void xocl_gem_prime_vunmap(struct drm_gem_object *obj, struct XOCL_MAP_TYPE *map)
+	{
 
-}
+	}
 #endif
 
 
@@ -1387,7 +1387,7 @@ int xocl_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 
 	vma->vm_private_data = obj;
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
 	vma->vm_flags |= VM_MIXEDMAP;
 #else
 	vm_flags_set(vma, VM_MIXEDMAP);

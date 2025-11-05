@@ -169,27 +169,33 @@
 #endif
 
 #if defined(RHEL_RELEASE_CODE)
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 2)
-#define RHEL_9_2_GE
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 1)
-#define RHEL_9_1_GE
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 0)
-#define RHEL_9_0_GE
-#endif
-#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 10)
-#define RHEL_8_10
-#endif
-#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 8)
-#define RHEL_8_8
-#endif
-#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 7)
-#define RHEL_8_7
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 5)
-#define RHEL_8_5_GE
-#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 5)
+		#define RHEL_9_5_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 4)
+		#define RHEL_9_4_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 2)
+		#define RHEL_9_2_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 1)
+		#define RHEL_9_1_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 0)
+		#define RHEL_9_0_GE
+	#endif
+	#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 10)
+		#define RHEL_8_10
+	#endif
+	#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 8)
+		#define RHEL_8_8
+	#endif
+	#if RHEL_RELEASE_CODE == RHEL_RELEASE_VERSION(8, 7)
+		#define RHEL_8_7
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 5)
+		#define RHEL_8_5_GE
+	#endif
 #endif
 
 #if defined(RHEL_RELEASE_CODE)

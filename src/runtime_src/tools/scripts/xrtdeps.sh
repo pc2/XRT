@@ -461,6 +461,7 @@ rocky_package_list() {
      protobuf-compiler \
      protobuf-devel \
      python3 \
+     python3-sphinx \
      python3-pip \
      python3-devel \
      rapidjson-devel \
