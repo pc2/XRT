@@ -12,27 +12,28 @@
 
 #include <linux/version.h>
 #if LINUX_VERSION_CODE <= KERNEL_VERSION(3, 0, 0)
-#include <drm/drm_backport.h>
+	#include <drm/drm_backport.h>
 #endif
 #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 5, 0)
-#if defined(RHEL_RELEASE_CODE)
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
-#include <drm/drm_device.h>
-#include <drm/drm_file.h>
-#include <drm/drm_ioctl.h>
-#include <drm/drm_drv.h>
+	#if defined(RHEL_RELEASE_CODE)
+		#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
+			#include <drm/drm_device.h>
+			#include <drm/drm_file.h>
+			#include <drm/drm_ioctl.h>
+			#include <drm/drm_drv.h>
+		#else
+			#include <drm/drmP.h>
+		#endif
+	#else
+		#include <drm/drmP.h>
+	#endif
 #else
-#include <drm/drmP.h>
+	#include <drm/drm_device.h>
+	#include <drm/drm_file.h>
+	#include <drm/drm_ioctl.h>
+	#include <drm/drm_drv.h>
 #endif
-#else
-#include <drm/drmP.h>
-#endif
-#else
-#include <drm/drm_device.h>
-#include <drm/drm_file.h>
-#include <drm/drm_ioctl.h>
-#include <drm/drm_drv.h>
-#endif
+
 #include <drm/drm_gem.h>
 #include <drm/drm_mm.h>
 #include <linux/interrupt.h>
@@ -60,24 +61,25 @@
 #include "kds_core.h"
 #include "xclerr_int.h"
 #include "ps_kernel.h"
+
 #if defined(RHEL_RELEASE_CODE)
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
-#include <linux/sched/signal.h>
-#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 3)
+		#include <linux/sched/signal.h>
+	#endif
 #endif
 
 #ifdef CONFIG_SUSE_KERNEL
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 14)
-#include <linux/suse_version.h>
-#endif
+	#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 14)
+		#include <linux/suse_version.h>
+	#endif
 #endif
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 6, 0)
-#define ioremap_nocache		ioremap
+	#define ioremap_nocache		ioremap
 #endif
 
 #ifndef mmiowb
-#define mmiowb()		do { } while (0)
+	#define mmiowb()		do { } while (0)
 #endif
 
 /* The fix for the y2k38 bug was introduced with Linux 3.17 and backported to
@@ -163,24 +165,30 @@
 #endif
 
 #ifdef CONFIG_SUSE_KERNEL
-#ifndef SLE_VERSION
-#define SLE_VERSION(a,b,c) KERNEL_VERSION(a,b,c)
-#endif
+	#ifndef SLE_VERSION
+		#define SLE_VERSION(a,b,c) KERNEL_VERSION(a,b,c)
+	#endif
 #endif
 
 #if defined(RHEL_RELEASE_CODE)
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 2)
-#define RHEL_9_2_GE
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 0)
-#define RHEL_9_0_GE
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 7)
-#define RHEL_8_7_GE
-#endif
-#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 5)
-#define RHEL_8_5_GE
-#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 5)
+		#define RHEL_9_5_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 4)
+		#define RHEL_9_4_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 2)
+		#define RHEL_9_2_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(9, 0)
+		#define RHEL_9_0_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 7)
+		#define RHEL_8_7_GE
+	#endif
+	#if RHEL_RELEASE_CODE >= RHEL_RELEASE_VERSION(8, 5)
+		#define RHEL_8_5_GE
+	#endif
 #endif
 
 #if defined(RHEL_RELEASE_CODE)

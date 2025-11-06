@@ -79,6 +79,8 @@ static int xocl_bo_mmap(struct file *filp, struct vm_area_struct *vma)
 		XOCL_DRM_GEM_OBJECT_PUT_UNLOCKED(&xobj->base);
 		return -EINVAL;
 	}
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
 	/* Clear VM_PFNMAP flag set by drm_gem_mmap()
 	 * we have "struct page" for all backing pages for bo
 	 */
@@ -89,6 +91,13 @@ static int xocl_bo_mmap(struct file *filp, struct vm_area_struct *vma)
 	vma->vm_flags &= ~VM_IO;
 	vma->vm_flags |= VM_MIXEDMAP;
 	vma->vm_flags |= mm->def_flags;
+#else
+	/* Clear VM_PFNMAP and VM_IO flag set by drm_gem_mmap()
+	 * we have "struct page" for all backing pages for bo
+	 */
+	vm_flags_clear(vma, VM_PFNMAP | VM_IO);
+	vm_flags_set(vma, VM_MIXEDMAP | mm->def_flags);
+#endif
 	vma->vm_pgoff = 0;
 
 	/* Override pgprot_writecombine() mapping setup by
@@ -145,9 +154,12 @@ static int xocl_native_mmap(struct file *filp, struct vm_area_struct *vma)
 	}
 
 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
 	vma->vm_flags |= VM_IO;
 	vma->vm_flags |= VM_RESERVED;
-
+#else
+	vm_flags_set(vma, VM_IO | VM_RESERVED);
+#endif
 	ret = io_remap_pfn_range(vma, vma->vm_start,
 				 res_start >> PAGE_SHIFT,
 				 vsize, vma->vm_page_prot);
@@ -391,6 +403,11 @@ static uint xocl_poll(struct file *filp, poll_table *wait)
 	return xocl_poll_client(filp, wait, priv->driver_priv);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 8, 0) || defined(RHEL_9_5_GE)
+	/* This was removed in 6.8 */
+	#define DRM_UNLOCKED 0
+#endif
+
 static const struct drm_ioctl_desc xocl_ioctls[] = {
 	DRM_IOCTL_DEF_DRV(XOCL_CREATE_BO, xocl_create_bo_ioctl,
 			  DRM_AUTH|DRM_UNLOCKED|DRM_RENDER_ALLOW),
@@ -515,8 +532,9 @@ static struct drm_driver mm_drm_driver = {
 	.fops				= &xocl_driver_fops,
 
 	.gem_prime_import_sg_table	= xocl_gem_prime_import_sg_table,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 6, 0) && !defined(RHEL_9_4_GE)
 	.gem_prime_mmap			= xocl_gem_prime_mmap,
-
+#endif
 	.prime_handle_to_fd		= drm_gem_prime_handle_to_fd,
 	.prime_fd_to_handle		= drm_gem_prime_fd_to_handle,
 	.gem_prime_import		= drm_gem_prime_import,

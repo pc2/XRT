@@ -393,7 +393,11 @@ static void __xocl_subdev_destroy(xdev_handle_t xdev_hdl,
 		case XOCL_SUBDEV_STATE_ACTIVE:
 		case XOCL_SUBDEV_STATE_OFFLINE:
 			device_release_driver(&pldev->dev);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0) &&!defined(RHEL_9_4_GE)
+			fallthrough;
+#else
 			/* fall through */
+#endif
 		case XOCL_SUBDEV_STATE_ADDED:
 		default:
 			__xocl_platform_device_unreg(xdev_hdl, pldev, state);

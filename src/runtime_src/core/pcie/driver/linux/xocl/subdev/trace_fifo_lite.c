@@ -209,11 +209,18 @@ static int trace_fifo_lite_mmap(struct file *filp, struct vm_area_struct *vma)
 	 * and prevent the pages from being swapped out
 	 */
 #ifndef VM_RESERVED
-	vma->vm_flags |= VM_IO | VM_DONTEXPAND | VM_DONTDUMP;
+	#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
+		vma->vm_flags |= VM_IO | VM_DONTEXPAND | VM_DONTDUMP;
+	#else
+		vm_flags_set(vma, VM_IO | VM_DONTEXPAND | VM_DONTDUMP);
+	#endif
 #else
-	vma->vm_flags |= VM_IO | VM_RESERVED;
+	#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
+		vma->vm_flags |= VM_IO | VM_RESERVED;
+	#else
+		vm_flags_set(vma, VM_IO | VM_RESERVED);
+	#endif
 #endif
-
 	/* make MMIO accessible to user space */
 	rc = io_remap_pfn_range(vma, vma->vm_start, phys >> PAGE_SHIFT,
 				vsize, vma->vm_page_prot);
