@@ -1379,7 +1379,7 @@ int xocl_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 		vma->vm_ops = xobj->dmabuf_vm_ops;
 	} else if (!IS_ERR_OR_NULL(xobj->base.dma_buf) && !IS_ERR_OR_NULL(xobj->base.dma_buf->file)) {
 		vma->vm_file = get_file(xobj->base.dma_buf->file);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0) || defined(RHEL_8_5_GE)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 11, 0) || defined(RHEL_9_5_GE)
 		vma->vm_ops = xobj->base.funcs->vm_ops;
 #else
 		vma->vm_ops = xobj->base.dev->driver->gem_vm_ops;
@@ -1387,8 +1387,11 @@ int xocl_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 	}
 
 	vma->vm_private_data = obj;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 3, 0) && !defined(RHEL_9_5_GE)
 	vma->vm_flags |= VM_MIXEDMAP;
-
+#else
+	vm_flags_set(vma, VM_MIXEDMAP);
+#endif
 	return 0;
 }
 

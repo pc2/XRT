@@ -1,3 +1,4 @@
+build/compile.log
 build/Debug*
 build/WDebug*
 build/Release*
